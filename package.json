@@ -1,0 +1,15 @@
+{
+  "name": "playwright-orangehrm-portfolio",
+  "version": "0.1.0",
+  "description": "Playwright + TypeScript automated test portfolio against OrangeHRM Demo (opensource-demo.orangehrmlive.com)",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --grep @ui",
+    "test:api": "playwright test --grep @api",
+    "test:report": "playwright show-report",
+    "test:trace": "playwright show-trace"
+  },
+  "license": "MIT"
+}
