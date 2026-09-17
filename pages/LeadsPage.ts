@@ -64,6 +64,10 @@ export class LeadsPage {
     return this.page.locator('.field[data-name="name"]');
   }
 
+  get detailStatusField() {
+    return this.page.locator('.field[data-name="status"]');
+  }
+
   get convertButton() {
     return this.page.locator('button[data-action="convert"]');
   }
@@ -159,10 +163,12 @@ export class LeadsPage {
     await amount.pressSequentially('1000');
     await expect(amount).toHaveValue(/1,000/);
     // Close Date：fill 后必须 Enter 确认（datepicker）；Escape 会清空值且弹层拦截后续 click（探测决议）
+    // 值动态取 90 天后；DD.MM.YYYY 与实例 datepicker 显示格式一致（探测实测 `17.09.2026`，故用 de-DE 而非 en-GB）
     const closeDate = this.convertOpportunitySection.locator('input[data-name="closeDate"]');
-    await closeDate.fill('31.12.2026');
+    const closeDateValue = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString('de-DE');
+    await closeDate.fill(closeDateValue);
     await closeDate.press('Enter');
-    await expect(closeDate).not.toHaveValue('');
+    await expect(closeDate).toHaveValue(/\d{2}\.\d{2}\.\d{4}/);
     await expect(this.datePicker).toHaveCount(0);
     await this.convertButton.click({ timeout: CLICK_TIMEOUT_MS });
     await expect(this.page).toHaveURL(/#\/?Lead\/view\//, { timeout: SAVE_TIMEOUT_MS });
