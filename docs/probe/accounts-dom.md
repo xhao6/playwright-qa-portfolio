@@ -37,6 +37,7 @@
 - **website 详情渲染为链接文本（无协议头）**：detail 视图 Website 显示 `<a href="https://updated.example.com">updated.example.com</a>`，body 文本断言用 `updated.example.com`（不含 `https://`）。
 - **行点击不导航**：`rowByName(name).click()` 点击行中心落在 td 上，**不触发导航**（EspoCRM 无行级 click handler）；必须点名称链接 `rowByName(name).locator('td[data-name="name"] a.link')`。
 - **open() 同 URL 无导航**：当前 hash 已是 `#/Account` 时 `goto('/#/Account')` 是 no-op（浏览器同文档 hash 相同不触发 hashchange），列表不刷新——配合上方「值相同跳过搜索」逻辑，`search()` 在 afterEach 重搜时是幂等的。
+- **漏删陷阱（review 修复，2026-09-17 实测复现）**：搜索 XHR 完成后行渲染滞后——`networkidle` 只等网络空闲、不等客户端渲染，紧接 `row.count()` 可能为 0，`removeByName` 早期 return 误判「已删除」→ **服务端记录残留（deleted:false）而测试仍绿**（行乐观移除掩盖）。修复：先轮询等行出现（最多 6 次 × 500ms）再决定是否删除；实测修复后连续跑无残留（API 复查 `Auto_*` 归零）。同期确认：删除 XHR 为 `DELETE /api/v1/Account/<id>`，200 且 body `true`（软删除；`GET /api/v1/Account/<id>` 对软删记录仍返回 200 带 `"deleted":true`，故按 GET 状态判断删除会误判）——`removeByName` 已改用 `waitForResponse` 匹配该方法+路径，替代原 `networkidle` 等待。
 
 ## 其他关键交互备忘
 

@@ -23,12 +23,11 @@ test.describe('Accounts', () => {
   test('edit updates account fields', async ({ page }) => {
     const accounts = new AccountsPage(page);
     await accounts.open();
-    await accounts.rowByName(name).locator('td[data-name="name"] a.link').click();
-    await expect(page.locator('.field[data-name="name"]')).toBeVisible();
-    await page.locator('button[data-action="edit"]').click();
+    await accounts.openRecord(name);
+    await accounts.editButton.click();
     await accounts.websiteInput.fill('https://updated.example.com');
     await accounts.saveButton.click();
-    await expect(page.locator('input[data-name="website"]')).toHaveCount(0, { timeout: 30_000 });
+    await expect(accounts.websiteInput).toHaveCount(0, { timeout: 30_000 });
     await expect(page.locator('body')).toContainText('updated.example.com');
   });
 
@@ -38,9 +37,16 @@ test.describe('Accounts', () => {
     await expect(accounts.rowByName(name)).toBeVisible();
   });
 
+  test('list search filters out non-matching names', async ({ page }) => {
+    const accounts = new AccountsPage(page);
+    await accounts.search('Auto_zzz_no_such_record');
+    await expect(accounts.rows).toHaveCount(0);
+  });
+
   test('delete removes the account from the list', async ({ page }) => {
     const accounts = new AccountsPage(page);
     await accounts.removeByName(name);
+    await accounts.refresh();
     await accounts.search(name);
     await expect(accounts.rowByName(name)).toHaveCount(0);
   });
