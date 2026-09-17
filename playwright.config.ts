@@ -41,6 +41,7 @@ export default defineConfig({
     {
       name: 'mobile',
       use: { ...devices['Pixel 5'], channel: 'chrome' },
+      testIgnore: '**/api/**',
       dependencies: ['setup'],
     },
     {
