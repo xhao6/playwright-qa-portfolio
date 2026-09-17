@@ -1,14 +1,27 @@
-import type { APIRequestContext } from '@playwright/test';
+import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { ENV } from '../../../playwright.config';
+
+export function basicAuthHeader(user = ENV.ADMIN_USER, pass = ENV.ADMIN_PASS) {
+  return {
+    'Espo-Authorization': Buffer.from(`${user}:${pass}`).toString('base64'),
+  };
+}
 
 export class EspoApi {
   private readonly authHeaders: Record<string, string>;
 
   constructor(private readonly request: APIRequestContext) {
-    const basic = Buffer.from(
-      `${ENV.ADMIN_USER}:${ENV.ADMIN_PASS}`,
-    ).toString('base64');
-    this.authHeaders = { 'Espo-Authorization': basic };
+    this.authHeaders = basicAuthHeader();
+  }
+
+  private async readBody(res: APIResponse): Promise<unknown> {
+    const contentType = res.headers()['content-type'] ?? '';
+    if (!contentType.includes('application/json')) return {};
+    try {
+      return await res.json();
+    } catch {
+      return {};
+    }
   }
 
   async create(entity: string, data: Record<string, unknown>) {
@@ -16,14 +29,14 @@ export class EspoApi {
       headers: this.authHeaders,
       data,
     });
-    return { status: res.status(), body: (await res.json()) as { id: string } };
+    return { status: res.status(), body: (await this.readBody(res)) as { id: string } };
   }
 
   async get(entity: string, id: string) {
     const res = await this.request.get(`/api/v1/${entity}/${id}`, {
       headers: this.authHeaders,
     });
-    return { status: res.status(), body: (await res.json()) as Record<string, unknown> };
+    return { status: res.status(), body: (await this.readBody(res)) as Record<string, unknown> };
   }
 
   async update(entity: string, id: string, data: Record<string, unknown>) {
@@ -31,14 +44,14 @@ export class EspoApi {
       headers: this.authHeaders,
       data,
     });
-    return { status: res.status(), body: (await res.json()) as Record<string, unknown> };
+    return { status: res.status(), body: (await this.readBody(res)) as Record<string, unknown> };
   }
 
   async remove(entity: string, id: string) {
     const res = await this.request.delete(`/api/v1/${entity}/${id}`, {
       headers: this.authHeaders,
     });
-    return { status: res.status(), body: (await res.json()) as Record<string, unknown> };
+    return { status: res.status(), body: (await this.readBody(res)) as boolean };
   }
 
   async search(entity: string, attribute: string, value: string) {
@@ -52,7 +65,7 @@ export class EspoApi {
     });
     return {
       status: res.status(),
-      body: (await res.json()) as { total: number; list: Array<Record<string, unknown>> },
+      body: (await this.readBody(res)) as { total: number; list: Array<Record<string, unknown>> },
     };
   }
 }
