@@ -16,7 +16,7 @@ test.describe('Accounts API', () => {
   });
 
   test.afterEach(async () => {
-    await api.remove('Account', accountId);
+    if (api && accountId) await api.remove('Account', accountId);
   });
 
   test('create returns an id and get returns the record', async () => {
@@ -41,7 +41,7 @@ test.describe('Accounts API', () => {
     expect(res.body.list.some((row) => row.id === accountId)).toBe(true);
   });
 
-  test('delete removes the record', async () => {
+  test('delete marks the record as deleted', async () => {
     const res = await api.remove('Account', accountId);
     expect(res.status).toBe(200);
     const after = await api.get('Account', accountId);
