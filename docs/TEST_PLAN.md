@@ -44,7 +44,7 @@
 ## 4. Test Data
 
 - **自建自清**：每个用例创建唯一命名数据，结束后清理
-- 唯一命名格式：`Auto_<prefix>_<ts>_<workerIndex>`（`tests/helpers/fixtures.ts` 的 `uniqueName` / `unique` 工厂）
+- 唯一命名格式：调用方传 `Auto_<prefix>` 前缀 + 工厂追加 `_<ts>_<seq|workerIndex>`（`uniqueName` 用模块级 seq；`unique` fixture 用 workerIndex）
 - 清理幂等：删除前先定位；记录不存在即跳过（支持重复运行；API 软删除天然幂等）
 - 不动预置数据；`workers=1`（本地与 CI 一致）避免并发写互扰
 
