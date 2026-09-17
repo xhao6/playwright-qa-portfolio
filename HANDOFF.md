@@ -6,12 +6,12 @@
 ## 0. 交接摘要（30 秒）
 
 - **项目**：Playwright + TypeScript 自动化测试作品集（投递 1030 电鸭 CRM QA、反哺主线 QA 自动化叙事）
-- **仓库**：本目录 `playwright-qa-portfolio`（本地 git；未 push GitHub）
+- **仓库**：本目录 `playwright-qa-portfolio`；**已 push GitHub** `https://github.com/xhao6/playwright-qa-portfolio`（main；历史已用 filter-repo 清除凭据）
 - **被测**：EspoCRM 实例（`<BASE_URL>`，经 `.env` 注入，不入库）；管理员凭据 `ADMIN_USER` / `ADMIN_PASS`（经 `.env` 注入，不入库）
 - **CI**：Github Actions 打**同一自有实例**（3 个 secrets：`ESPOCRM_BASE_URL` / `ESPOCRM_ADMIN_USER` / `ESPOCRM_ADMIN_PASS`）；**无公开 demo 通道**
 - **包管理**：**pnpm**（`pnpm-lock.yaml` 已生成；CI 用 `pnpm install --frozen-lockfile`）
 - **状态**：env 接入、config、登录 POM、auth.setup(storageState) 完成；**auth.spec 3/3 绿**；**accounts.spec 5 用例（含搜索负向控制）绿**；**leads.spec 4 用例（含搜索负向控制 + Convert）绿**；**fixtures 通用化完成（uniqueName + unique fixture）**；**全量 29/29 绿**（desktop + mobile，~2m）
-- **下一步**：CI secrets 配置 → GitHub push
+- **下一步**：全部 P0/P1 完成 ✅（CI secrets 已配、已 push、Actions 绿 3m18s）；后续按 P2 加分项推进
 
 ## 1. 决策基线（用户确认，必须遵守）
 
