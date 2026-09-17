@@ -1,6 +1,6 @@
 # Accounts 页 DOM 探测决议（2026-09-17）
 
-> 来源：临时 probe spec `tests/probe/accounts.probe.spec.ts`（已删除）对自有 EspoCRM 实例（`http://<BASE_URL>`）的真实 DOM 探测。
+> 来源：临时 probe spec `tests/probe/accounts.probe.spec.ts`（已删除）对自有 EspoCRM 实例（`<BASE_URL>`）的真实 DOM 探测。
 > 用法：`pages/AccountsPage.ts` 与 `tests/accounts.spec.ts` 的 locator 一律以本文件为准。
 
 ## Accounts Locator 决议
@@ -40,7 +40,7 @@
 ### Probe 1 — 列表 / 创建表单
 
 ```
-listLoaded url: http://<BASE_URL>/#/Account
+listLoaded url: <BASE_URL>/#/Account
 allButtons text: ["\n            \n        ","\n                    All\n                    \n                ","\n                    \n                ","\n                    \n                ","\n                    \n                ","Actions \n                ","Actions ",""]
 createLink(a[href*="create"]): count=1
 createButton(getByRole button create): count=0
@@ -50,7 +50,7 @@ searchInput: name=null placeholder=Search
 listQuickSearch(textFilter): count=1 placeholder=null html=<input type="search" class="form-control text-filter" data-name="textFilter" value="" tabindex="0" autocomplete="espo-dummy" spellcheck="false">
 input[type=search] count: 2 placeholders=["Search",null]
 rows locator candidates: count=8
-afterCreateClick url: http://<BASE_URL>/#Account/create
+afterCreateClick url: <BASE_URL>/#Account/create
 editView: edit-view-rendered
 formFields: [第一项 {tag:input, type:search, placeholder:Search}(导航搜索) → {input text}(Name) → {input text}(Website) → {input email}(Email) → select → {input text} → {input text placeholder:"000-000-0000"}(Phone ×2) → textarea/Street → City → State → Postal Code → Country（billing ×5，shipping ×5） → select(type) → input → select(industry) → input → textarea(description) → input placeholder:"Select"(assignedUserName) → input(assignedUserId) → input placeholder:"Select"(teams) …]
 wideFields count: 25
@@ -91,7 +91,7 @@ confirmModal dismissed (Cancel clicked) — 未删除任何数据
 search functional: fill+Enter textFilter=zzz_probe_no_such_name → rows=0 ✓
 search functional: fill+Enter textFilter=test → rows>=1 ✓
 rowNameLink: count=1
-rowClickNav: url=http://<BASE_URL>/#Account/view/6aaa62cc954b58c46 detail rendered ✓
+rowClickNav: url=<BASE_URL>/#Account/view/6aaa62cc954b58c46 detail rendered ✓
 rowClickNav urlContainsView: false   ← 无前导斜杠（#Account/view/…），URL 断言需用 /#\/?Account\/view\//
 ```
 
