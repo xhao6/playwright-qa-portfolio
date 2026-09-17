@@ -1,7 +1,7 @@
 {
-  "name": "playwright-orangehrm-portfolio",
+  "name": "playwright-qa-portfolio",
   "version": "0.1.0",
-  "description": "Playwright + TypeScript automated test portfolio against OrangeHRM Demo (opensource-demo.orangehrmlive.com)",
+  "description": "Playwright + TypeScript automated test portfolio against a private EspoCRM instance",
   "type": "module",
   "scripts": {
     "test": "playwright test",
@@ -11,5 +11,10 @@
     "test:report": "playwright show-report",
     "test:trace": "playwright show-trace"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "dotenv": "^17.4.2",
+    "typescript": "^7.0.2"
+  }
 }

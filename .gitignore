@@ -7,3 +7,4 @@ playwright/.auth/
 .dist/
 *.log
 .DS_Store
+.env

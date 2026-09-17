@@ -1,9 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
+import 'dotenv/config';
 
-const ENV = {
-  BASE_URL: 'https://opensource-demo.orangehrmlive.com',
-  ADMIN_USER: 'Admin',
-  ADMIN_PASS: 'admin123',
+export const ENV = {
+  BASE_URL: process.env.BASE_URL || '',
+  ADMIN_USER: process.env.ADMIN_USER || '',
+  ADMIN_PASS: process.env.ADMIN_PASS || '',
 };
 
 export default defineConfig({
@@ -38,16 +39,10 @@ export default defineConfig({
       dependencies: ['setup'],
     },
     {
-      name: 'tablet',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome', viewport: { width: 768, height: 1024 } },
-      dependencies: ['setup'],
-    },
-    {
       name: 'mobile',
-      use: { ...devices['Pixel 5'] },
+      use: { ...devices['Pixel 5'], channel: 'chrome' },
       dependencies: ['setup'],
     },
-    // WebKit smoke: cross-browser evidence without full matrix cost
     {
       name: 'webkit-smoke',
       use: { ...devices['Desktop Safari'] },
@@ -56,5 +51,3 @@ export default defineConfig({
     },
   ],
 });
-
-export { ENV };

@@ -1,19 +1,27 @@
-# Playwright + OrangeHRM — QA Automation Portfolio
+# Playwright + EspoCRM — QA Automation Portfolio
 
-Playwright (TypeScript) test automation portfolio built against the publicly available [OrangeHRM Demo](https://opensource-demo.orangehrmlive.com), demonstrating professional-level test engineering:
+Playwright (TypeScript) test automation portfolio built against a private **EspoCRM** instance, demonstrating professional-level test engineering:
 
-- Self-contained, resilient tests for a dynamic external application
+- Self-contained, resilient tests for a live CRM application
 - Page Object Model + typed fixtures + shared authenticated session (storageState)
-- Multi-project matrix (desktop / tablet / mobile) + WebKit smoke
+- Multi-project matrix (desktop / mobile) + WebKit smoke channel
 - CI via GitHub Actions with HTML report, traces, videos and failure screenshots as artifacts
+
+## Configuration
+
+The target instance and credentials are injected via environment (`.env`, gitignored):
+
+```bash
+cp .env.example .env   # fill in your EspoCRM instance URL + admin credentials
+```
 
 ## Quick start
 
 ```bash
 npm install
-npx playwright install chromium     # use --with-deps on Linux CI
-npm test                             # run all projects
-npx playwright show-report           # view HTML report
+npx playwright install chromium          # use --with-deps on Linux CI
+npm test                                  # run all projects against your instance
+npx playwright show-report                # view HTML report
 ```
 
 ## Projects
@@ -21,16 +29,15 @@ npx playwright show-report           # view HTML report
 | Project | Target | Purpose |
 |---|---|---|
 | `desktop-chromium` | Desktop Chrome | Full UI suite |
-| `tablet` | 768×1024 Chrome | Responsive behavior |
 | `mobile` | Pixel 5 | Mobile viewport |
 | `webkit-smoke` | Desktop Safari | Cross-browser smoke evidence |
 
-## Notes on the OrangeHRM Demo
+## Test discipline
 
-The public demo is periodically slow or reset (documented upstream). Tests therefore follow **self-contained data** discipline:
+Tests follow **self-contained data** rules (no reliance on pre-existing rows):
 
-- every test creates its own uniquely-named data and cleans it up (fixtures),
-- no test depends on pre-existing rows,
-- parallel-safe via unique suffixes.
+- every test creates uniquely-named data and cleans it up (fixtures),
+- parallel-safe via unique suffixes,
+- results/artifacts land in `test-results/` (gitignored).
 
-> **Known constraint**: the demo site serves render-blocking CSS slowly from some networks (e.g. mainland China). Local runs may take a while; CI (GitHub-hosted) is the canonical fast path. See `SETUP_TROUBLESHOOTING.md` if stalls persist.
+> The instance is user-owned; treat credentials as secrets (`BASE_URL`, `ADMIN_USER`, `ADMIN_PASS` are injected, never committed).
