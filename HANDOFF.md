@@ -79,7 +79,7 @@ playwright-qa-portfolio/
 ### P2 · 加分（后续可选）
 - `search-table`（搜索/排序/分页）· `i18n`（切中文判定功能）· `responsive`（3 视口）· `acl`（Administration → Roles）
 - ✅ **API 测试层**：已完成并合入（10/10 绿，见 §3；计划 `docs/superpowers/plans/2026-09-17-api-test-layer.md`）
-- **测试策略文档**：计划见 `docs/superpowers/plans/2026-09-17-test-strategy-doc.md`
+- ✅ **测试策略文档**：已完成并合入（`docs/TEST_PLAN.md`，见 §7；计划 `docs/superpowers/plans/2026-09-17-test-strategy-doc.md`）
 
 ## 5. 技术备忘 / 易踩坑
 
@@ -104,4 +104,4 @@ playwright-qa-portfolio/
 - Playwright：/docs/pom · /test-fixtures · /test-configuration · /auth · /test-retries · /test-parallel · /ci
 - 被测入口：`<BASE_URL>`（env 注入；凭据 `ADMIN_USER`/`ADMIN_PASS`，见 `.env.example`）
 
-_文档版本：2026-09-17 · HANDOFF v3.2_
+_文档版本：2026-09-17 · HANDOFF v3.3_
