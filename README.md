@@ -15,8 +15,9 @@ Playwright (TypeScript) test automation portfolio built against a private **Espo
 | Login Page Object Model (`pages/LoginPage.ts`) | Done |
 | Shared auth session (`tests/auth.setup.ts` → storageState) | Done |
 | Auth suite (`tests/auth.spec.ts`): valid login / wrong password / empty-field validation | Done, passing |
-| Accounts / Leads business specs | Planned (next) |
-| Data factory fixtures (`tests/helpers/fixtures.ts`) | Present; to be generalized into a unique-data factory |
+| Accounts spec (`tests/accounts.spec.ts`): create / detail / edit / search / delete | Done, passing |
+| Leads spec (`tests/leads.spec.ts`): create / search / convert | Done, passing |
+| Data factory fixtures (`tests/helpers/fixtures.ts`) | Done (`uniqueName` + `unique` fixture) |
 | CI workflow (`.github/workflows/ci.yml`) | Ready; requires 3 GitHub secrets |
 | GitHub push | Pending (repo not yet published) |
 
