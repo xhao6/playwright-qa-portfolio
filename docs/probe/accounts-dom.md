@@ -25,6 +25,19 @@
 - **详情 Name 值**：`.field[data-name="name"]` → `<div class="field" data-name="name"><span class="">test</span></div>`。body 文本断言用记录名即可。
 - 详情头部另有 `Star`（data-action="star"）、`Follow`（data-action="follow"）、面包屑 `a[data-action="navigateToRoot"]`。无独立 Actions 下拉（detailActionsBtn count=0）。
 
+## Task 3 实测增补（accounts.spec 红→修过程中新发现，2026-09-17）
+
+> 以下为 `pages/AccountsPage.ts` / `tests/accounts.spec.ts` 实现与调绿过程中实测确认的行为，均已在最终代码中固化：
+
+- **搜索重放陷阱（最坑）**：`fill()` 后 `press('Enter')` 时，若过滤框**当前值与新值相同**，EspoCRM 不会发 XHR，但会触发一次**延迟的客户端重渲染**（Enter 后 ~200–1000ms，无网络请求，`networkidle` 无法捕获）。此行重渲染会替换行元素并**关闭已打开的行菜单**——在「menuItem 可见性检查通过 → click 被 clobber」窗口内必挂。**修复**：`search()` 先 `inputValue()` 对比，相同则跳过 fill+Enter（`pages/AccountsPage.ts`）。
+- **Playwright click 无默认超时**：元素「attached 但不可见/不稳定」时 click 会无限重试直到测试超时，`try/catch` 重试循环**永远不会推进**。**修复**：`removeByName` 内所有 click 显式 `{ timeout: 4_000 }`，每次失败后 `waitForTimeout(500)` 等重渲染稳定再重试（最多 6 次）。
+- **删除 XHR 很慢**：确认弹窗点击后行会**立即从 DOM 消失（乐观移除）**，但服务端 DELETE 需 30–90s 才完成；期间再搜索会查到旧数据、且 DELETE 完成时列表会重渲染（clobber 行交互）。**修复**：confirm 后 `waitForLoadState('networkidle')` 等 DELETE 完成，再断言行消失。
+- **Edit 保存后表单 teardown 竞态**：编辑保存后详情已渲染（body 含新值）但表单 `isChanged` 清理滞后，立即 `goto` 回列表会弹「Are you sure you want to leave the form?」。**修复**：编辑用例保存后等 `input[data-name="website"]` `toHaveCount(0)`（表单关闭信号，30s 超时），再断言 body 文本；`open()` 额外兜底：若出现该弹窗点 Yes。
+- **Edit 路由不变**：详情页点 Edit 后 URL **仍是 `#Account/view/<id>`**（不变成 edit 路由），因此编辑用例无需（也无法）断言 URL 变化。
+- **website 详情渲染为链接文本（无协议头）**：detail 视图 Website 显示 `<a href="https://updated.example.com">updated.example.com</a>`，body 文本断言用 `updated.example.com`（不含 `https://`）。
+- **行点击不导航**：`rowByName(name).click()` 点击行中心落在 td 上，**不触发导航**（EspoCRM 无行级 click handler）；必须点名称链接 `rowByName(name).locator('td[data-name="name"] a.link')`。
+- **open() 同 URL 无导航**：当前 hash 已是 `#/Account` 时 `goto('/#/Account')` 是 no-op（浏览器同文档 hash 相同不触发 hashchange），列表不刷新——配合上方「值相同跳过搜索」逻辑，`search()` 在 afterEach 重搜时是幂等的。
+
 ## 其他关键交互备忘
 
 - **SPA 异步渲染**：`goto('/#/Account')` 后必须等列表头部稳定（`expect(a[data-action="create"]).toBeVisible()`）再操作；此前直接探测会拿到空壳 DOM（rows=1 假象）。
