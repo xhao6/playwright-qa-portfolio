@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { test, uniqueName } from '../helpers/fixtures';
 import { EspoApi } from './helpers/espo-api';
 
-test.describe('Accounts API', () => {
+test.describe('Accounts API @api', () => {
   let api: EspoApi;
   let accountId: string;
   let name: string;

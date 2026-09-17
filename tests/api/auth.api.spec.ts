@@ -2,7 +2,7 @@ import { expect, test, request as pwRequest } from '@playwright/test';
 import { ENV } from '../../playwright.config';
 import { basicAuthHeader } from './helpers/espo-api';
 
-test.describe('API auth', () => {
+test.describe('API auth @api', () => {
   test('valid admin credentials authenticate with Basic auth', async () => {
     const ctx = await pwRequest.newContext({ storageState: { cookies: [], origins: [] } });
     try {
