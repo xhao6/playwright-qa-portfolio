@@ -29,7 +29,7 @@
 | Auth setup | `tests/auth.setup.ts` | 登录一次 → storageState 复用；所有 project 的前置依赖 |
 | UI E2E | `tests/*.spec.ts` | 用户旅程级验证；locator 收敛在 `pages/*.ts`（POM） |
 | API | `tests/api/` | REST 契约与 CRUD；Playwright request context，不经过浏览器；每请求 Basic auth（`Espo-Authorization`） |
-| Smoke | `tests/smoke/` | WebKit 关键路径冒烟（仅 webkit-smoke project） |
+| Smoke | `tests/smoke/` | WebKit 关键路径冒烟（仅 webkit-smoke project）（预留，待 P2 落地） |
 | Probe（临时） | `tests/probe/` | 探测真实 DOM/API 行为，产出决议到 `docs/probe/` 后删除 |
 
 分层原则：UI 测用户可见行为，API 测契约与数据完整性；同一业务域的 UI 与 API 用例互补，不互相依赖。
@@ -44,7 +44,7 @@
 ## 4. Test Data
 
 - **自建自清**：每个用例创建唯一命名数据，结束后清理
-- 唯一命名格式：调用方传 `Auto_<prefix>` 前缀 + 工厂追加 `_<ts>_<seq|workerIndex>`（`uniqueName` 用模块级 seq；`unique` fixture 用 workerIndex）
+- 唯一命名格式：调用方传 `Auto_<prefix>` 前缀 + 工厂追加 `_<ts>_<seq|workerIndex>`（`uniqueName` 用模块级 seq；`unique` fixture 用 workerIndex，同测内重复前缀追加 `_2` 去重）
 - 清理幂等：删除前先定位；记录不存在即跳过（支持重复运行；API 软删除天然幂等）
 - 不动预置数据；`workers=1`（本地与 CI 一致）避免并发写互扰
 
@@ -62,7 +62,7 @@
 | `setup` | — | 认证前置（auth.setup） |
 | `desktop-chromium` | Desktop Chrome（channel chrome） | 全量（UI + API） |
 | `mobile` | Pixel 5 | UI 全量（`tests/api/` 排除） |
-| `webkit-smoke` | Desktop Safari | `tests/smoke/` |
+| `webkit-smoke` | Desktop Safari | `tests/smoke/`（预留，尚无 spec） |
 
 ```bash
 pnpm test                              # 全量（本地）
@@ -92,9 +92,9 @@ pnpm exec playwright show-report       # 查看 HTML 报告
 
 ## 9. Exit Criteria
 
-- 所有 project 全绿（至少 `pnpm test --project=desktop-chromium` 与本地全量）
+- CI（`desktop-chromium`）绿 且 本地全量绿（setup / desktop-chromium / mobile / webkit-smoke）
 - 无 `Auto_` 前缀残留数据（抽查 Accounts / Leads 列表与 API search）
-- HTML 报告可查；失败用例有 trace 可诊断
+- HTML 报告可查；CI 失败用例有 trace 可诊断（本地失败仅 screenshot）
 - 新增/修改的 spec 满足本文件第 4、5 节纪律
 
 ## 10. References
@@ -102,4 +102,5 @@ pnpm exec playwright show-report       # 查看 HTML 报告
 - [`../AGENTS.md`](../AGENTS.md) — 开发准则（必守规则、架构约定）
 - [`../HANDOFF.md`](../HANDOFF.md) — 进度、待办与交接
 - [`probe/`](./probe/) — 真实 DOM/API 决议（探测产物）
-- Playwright 官方：best-practices · test-fixtures · pom · ci
+- Playwright 官方：best-practices · test-fixtures · pom · ci（完整 URL 见 `../AGENTS.md` 参考节）
+- [`target-understanding.md`](./target-understanding.md) — 被测系统理解（模块/字段/实体关系，实测）
