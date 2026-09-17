@@ -17,6 +17,7 @@ Playwright (TypeScript) test automation portfolio built against a private **Espo
 | Auth suite (`tests/auth.spec.ts`): valid login / wrong password / empty-field validation | Done, passing |
 | Accounts spec (`tests/accounts.spec.ts`): create / detail / edit / search / delete | Done, passing |
 | Leads spec (`tests/leads.spec.ts`): create / search / convert | Done, passing |
+| API tests (`tests/api/`): auth + Account/Lead CRUD & search | Done, passing (10 tests) |
 | Data factory fixtures (`tests/helpers/fixtures.ts`) | Done (`uniqueName` + `unique` fixture) |
 | CI workflow (`.github/workflows/ci.yml`) | Running — Actions green (push + workflow_dispatch) |
 | GitHub push | Done — `github.com/xhao6/playwright-qa-portfolio` (public) |
@@ -44,8 +45,8 @@ pnpm exec playwright show-report         # view HTML report
 
 | Project | Target | Purpose |
 |---|---|---|
-| `desktop-chromium` | Desktop Chrome | Full UI suite |
-| `mobile` | Pixel 5 | Mobile viewport |
+| `desktop-chromium` | Desktop Chrome | Full suite (UI + API) |
+| `mobile` | Pixel 5 | Mobile viewport (API specs excluded) |
 | `webkit-smoke` | Desktop Safari | Reserved for cross-browser smoke suite (no specs yet) |
 
 All projects depend on `setup`, which logs in once and persists `storageState` for shared sessions.

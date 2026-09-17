@@ -10,8 +10,8 @@
 - **被测**：EspoCRM 实例（`<BASE_URL>`，经 `.env` 注入，不入库）；管理员凭据 `ADMIN_USER` / `ADMIN_PASS`（经 `.env` 注入，不入库）
 - **CI**：Github Actions 打**同一自有实例**（3 个 secrets：`ESPOCRM_BASE_URL` / `ESPOCRM_ADMIN_USER` / `ESPOCRM_ADMIN_PASS`）；**无公开 demo 通道**
 - **包管理**：**pnpm**（`pnpm-lock.yaml` 已生成；CI 用 `pnpm install --frozen-lockfile`）
-- **状态**：env 接入、config、登录 POM、auth.setup(storageState) 完成；**auth.spec 3/3 绿**；**accounts.spec 5 用例（含搜索负向控制）绿**；**leads.spec 4 用例（含搜索负向控制 + Convert）绿**；**fixtures 通用化完成（uniqueName + unique fixture）**；**全量 29/29 绿**（desktop + mobile，~2m）
-- **下一步**：全部 P0/P1 完成 ✅（CI secrets 已配、已 push、Actions 绿 3m18s）；后续按 P2 加分项推进
+- **状态**：env 接入、config、登录 POM、auth.setup(storageState) 完成；**auth.spec 3/3 绿**；**accounts.spec 5 用例（含搜索负向控制）绿**；**leads.spec 4 用例（含搜索负向控制 + Convert）绿**；**API 层 10/10 绿（`tests/api/`：Basic auth + Account/Lead CRUD & search）**；**fixtures 通用化完成（uniqueName + unique fixture）**
+- **下一步**：全部 P0/P1 完成 ✅（CI secrets 已配、已 push、Actions 绿）；**API 测试层已完成并合入**；后续按 P2 加分项推进（search-table / i18n / responsive / acl）+ 测试策略文档
 
 ## 1. 决策基线（用户确认，必须遵守）
 
@@ -36,11 +36,12 @@ playwright-qa-portfolio/
 │   ├── auth.spec.ts       # ✅ 3/3 绿
 │   ├── accounts.spec.ts   # ✅ 5/5 绿（创建/详情/编辑/搜索×2/删除；自建自清）
 │   ├── leads.spec.ts      # ✅ 4/4 绿（创建/搜索×2/Convert；转换产物走 API 清理）
+│   ├── api/               # ✅ API 层：helpers/espo-api.ts + auth/accounts/leads spec（@api tag）
 │   ├── helpers/fixtures.ts# ✅ 已通用化：uniqueName（模块级 seq）+ unique fixture（workerIndex）
 │   └── helpers/fixtures.spec.ts # ✅ fixtures 自测 2/2
 ├── docs/
 │   ├── target-understanding.md # 被测全局理解（模块/字段/实体关系，实测）
-│   └── probe/accounts-dom.md · probe/leads-dom.md # probe 决议（locator 依据）
+│   └── probe/accounts-dom.md · probe/leads-dom.md · probe/api-notes.md # probe 决议（locator/API 依据）
 ├── .github/workflows/ci.yml  # secrets 注入自有实例（pnpm）
 └── README.md              # 已更新（被测=EspoCRM 实例；pnpm 命令）
 ```
@@ -61,6 +62,7 @@ playwright-qa-portfolio/
 | AccountsPage + accounts.spec | 创建（`unique('Auto_Account')`）→ 详情 → 编辑 website → 列表搜索（命中 + 负向控制 `Auto_zzz_no_such_record`）→ 删除清理；5/5 绿；locator 收敛 POM |
 | LeadsPage + leads.spec | 创建 Lead → 详情 → 列表搜索（命中 + 负向控制）→ **Convert**（断言 status=Converted、Convert 按钮消失）；4/4 绿；**转换产物 Account/Contact/Opportunity 走 API 清理**（`Espo-Authorization` + 删除 `createdAccountId/createdContactId/createdOpportunityId`），失败仅 console.error 不掩盖断言 |
 | fixtures | `uniqueName(prefix)`（`Auto_<ts>` + 模块级 seq）+ `unique` fixture（`Auto_<ts>` + workerIndex，同测内去重），自测 2/2 绿 |
+| API 层 | `tests/api/`：`EspoApi` client（每请求 `Espo-Authorization` Basic，含错误响应安全解析）+ auth 3 / accounts 4 / leads 3 用例（**软删除断言 `deleted: true`**，非 404）；mobile project 排除 API（`testIgnore: '**/api/**'`）；`@api` tag 激活 `pnpm test:api`；10/10 绿 |
 | 元数据 | 仓库更名 `playwright-qa-portfolio`；README/package 更新为 EspoCRM 实例；切 **pnpm**（删 package-lock.json，CI/README/HANDOFF 同步）；新增 `AGENTS.md` 开发准则 |
 
 ## 4. 待办（接手顺序）
@@ -76,7 +78,7 @@ playwright-qa-portfolio/
 
 ### P2 · 加分（后续可选）
 - `search-table`（搜索/排序/分页）· `i18n`（切中文判定功能）· `responsive`（3 视口）· `acl`（Administration → Roles）
-- **API 测试层**：`Espo-Authorization` basic 认证通道已探明（见 §5 与 `docs/probe/leads-dom.md`），计划见 `docs/superpowers/plans/2026-09-17-api-test-layer.md`
+- ✅ **API 测试层**：已完成并合入（10/10 绿，见 §3；计划 `docs/superpowers/plans/2026-09-17-api-test-layer.md`）
 - **测试策略文档**：计划见 `docs/superpowers/plans/2026-09-17-test-strategy-doc.md`
 
 ## 5. 技术备忘 / 易踩坑
@@ -102,4 +104,4 @@ playwright-qa-portfolio/
 - Playwright：/docs/pom · /test-fixtures · /test-configuration · /auth · /test-retries · /test-parallel · /ci
 - 被测入口：`<BASE_URL>`（env 注入；凭据 `ADMIN_USER`/`ADMIN_PASS`，见 `.env.example`）
 
-_文档版本：2026-09-17 · HANDOFF v3.1_
+_文档版本：2026-09-17 · HANDOFF v3.2_
