@@ -1,74 +1,76 @@
-# Playwright + EspoCRM — QA Automation Portfolio
+# Playwright + EspoCRM — QA 自动化测试作品集
 
-Playwright (TypeScript) test automation portfolio built against a private **EspoCRM** instance, demonstrating professional-level test engineering:
+基于 **TypeScript + Playwright** 的端到端自动化测试作品集，被测对象为**自有 EspoCRM 实例**（CRM 产品），展示专业级测试工程能力：
 
-- Self-contained, resilient tests for a live CRM application
-- Page Object Model + typed fixtures + shared authenticated session (storageState)
-- Multi-project matrix (desktop / mobile) + WebKit smoke channel
-- CI via GitHub Actions with HTML report, traces, videos and failure screenshots as artifacts
+- 针对真实 CRM 应用的健壮、自包含的自动化测试
+- Page Object Model（POM）+ 类型化 Fixtures + 共享登录态（storageState）
+- 多项目矩阵（桌面 / 移动端）+ WebKit 跨浏览器冒烟通道
+- GitHub Actions CI：HTML 报告、trace、视频、失败截图产物
 
-## Current status
+## 当前状态
 
-| Area | Status |
+| 模块 | 状态 |
 |---|---|
-| Env injection (`dotenv`, baseURL from env) | Done |
-| Login Page Object Model (`pages/LoginPage.ts`) | Done |
-| Shared auth session (`tests/auth.setup.ts` → storageState) | Done |
-| Auth suite (`tests/auth.spec.ts`): valid login / wrong password / empty-field validation | Done, passing |
-| Accounts spec (`tests/accounts.spec.ts`): create / detail / edit / search / delete | Done, passing |
-| Leads spec (`tests/leads.spec.ts`): create / search / convert | Done, passing |
-| API tests (`tests/api/`): auth + Account/Lead CRUD & search | Done, passing (10 tests) |
-| Data factory fixtures (`tests/helpers/fixtures.ts`) | Done (`uniqueName` + `unique` fixture) |
-| CI workflow (`.github/workflows/ci.yml`) | Running — Actions green (push + workflow_dispatch) |
-| GitHub push | Done — `github.com/xhao6/playwright-qa-portfolio` (public) |
+| 环境注入（dotenv，baseURL 取自 env） | ✅ 完成 |
+| 登录 POM（`pages/LoginPage.ts`） | ✅ 完成 |
+| 共享登录态（`tests/auth.setup.ts` → storageState） | ✅ 完成 |
+| 认证套件（`tests/auth.spec.ts`）：正确登录 / 错密码 / 空字段 | ✅ 通过 |
+| Accounts spec（`tests/accounts.spec.ts`）：创建 / 详情 / 编辑 / 搜索（含负向）/ 删除 | ✅ 通过 |
+| Leads spec（`tests/leads.spec.ts`）：创建 / 搜索（含负向）/ Convert 转换 | ✅ 通过 |
+| API 测试层（`tests/api/`）：认证 + Account/Lead CRUD & 搜索 | ✅ 通过（10 用例） |
+| 数据工厂 Fixtures（`tests/helpers/fixtures.ts`） | ✅ 完成（`uniqueName` + `unique` fixture） |
+| CI workflow（`.github/workflows/ci.yml`） | ✅ 运行中 — Actions 绿（push + workflow_dispatch） |
+| GitHub push | ✅ 已推送 `github.com/xhao6/playwright-qa-portfolio`（public） |
 
-> Tracked in detail in [`HANDOFF.md`](./HANDOFF.md).
+> 进度明细见 [`HANDOFF.md`](./HANDOFF.md)，测试策略见 [`docs/TEST_PLAN.md`](./docs/TEST_PLAN.md)，开发规范见 [`AGENTS.md`](./AGENTS.md)。
 
-## Configuration
+## 配置
 
-The target instance and credentials are injected via environment (`.env`, gitignored):
+被测实例与凭据通过环境变量注入（`.env`，已 gitignore）：
 
 ```bash
-cp .env.example .env   # fill in your EspoCRM instance URL + admin credentials
+cp .env.example .env   # 填入你的 EspoCRM 实例地址与管理员凭据
 ```
 
-## Quick start
+## 快速开始
 
 ```bash
 pnpm install
-pnpm exec playwright install chromium   # use --with-deps on Linux CI
-pnpm test                                # run all projects against your instance
-pnpm exec playwright show-report         # view HTML report
+pnpm exec playwright install chromium     # Linux CI 上使用 --with-deps
+pnpm test                                  # 针对你的实例运行全部 project
+pnpm test:api                              # 仅运行 API 用例（@api tag）
+pnpm exec playwright show-report           # 查看 HTML 报告
 ```
 
-## Projects
+## 项目矩阵
 
-| Project | Target | Purpose |
+| Project | 目标 | 用途 |
 |---|---|---|
-| `desktop-chromium` | Desktop Chrome | Full suite (UI + API) |
-| `mobile` | Pixel 5 | Mobile viewport (API specs excluded) |
-| `webkit-smoke` | Desktop Safari | Reserved for cross-browser smoke suite (no specs yet) |
+| `setup` | — | 登录一次 → 持久化 storageState（所有 project 的前置依赖） |
+| `desktop-chromium` | Desktop Chrome | 全量套件（UI + API） |
+| `mobile` | Pixel 5 | 移动端视口（API 用例排除） |
+| `webkit-smoke` | Desktop Safari | 跨浏览器冒烟通道（预留，尚无 spec） |
 
-All projects depend on `setup`, which logs in once and persists `storageState` for shared sessions.
+## 测试纪律
 
-## Test discipline
+测试遵循**自包含数据**原则（不依赖既有数据）：
 
-Tests follow **self-contained data** rules (no reliance on pre-existing rows):
+- 每个业务 spec 创建唯一命名数据并事后清理（自建自清）
+- 并行安全：唯一后缀（`Auto_<ts>` + workerIndex / 模块级 seq）
+- 定位器优先用户可见属性（role / text / label / test-id），仅用 Web-first 断言
+- 新页面/新接口先 probe 探测真实 DOM/API 落决议（`docs/probe/`），再落正式 spec
+- 结果/产物落 `test-results/`（已 gitignore）
 
-- every business spec creates uniquely-named data and cleans it up afterwards,
-- parallel-safe via unique suffixes (`Auto_<ts>` + workerIndex),
-- results/artifacts land in `test-results/` (gitignored).
+## CI（GitHub Actions）
 
-## CI (GitHub Actions)
+workflow 在 push main 与手动 dispatch 时触发，通过 3 个 secrets 访问同一自有实例：
 
-The workflow runs on push to `main` and manual dispatch, and targets the same private instance via 3 secrets:
-
-| Secret | Maps to |
+| Secret | 对应变量 |
 |---|---|
 | `ESPOCRM_BASE_URL` | `BASE_URL` |
 | `ESPOCRM_ADMIN_USER` | `ADMIN_USER` |
 | `ESPOCRM_ADMIN_PASS` | `ADMIN_PASS` |
 
-It installs Chromium, runs the `desktop-chromium` project, and uploads the HTML report plus traces/videos/screenshots as artifacts (30-day retention).
+安装 Chromium 后运行 `desktop-chromium` project（retries=2），上传 HTML 报告与 trace/视频/截图产物（保留 30 天）。
 
-> The instance is user-owned; treat credentials as secrets (`BASE_URL`, `ADMIN_USER`, `ADMIN_PASS` are injected, never committed).
+> 被测实例为用户自有；凭据视为机密（`BASE_URL` / `ADMIN_USER` / `ADMIN_PASS` 一律注入，永不入库）。
