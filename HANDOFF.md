@@ -1,7 +1,7 @@
 # 作品集开发执行计划 & 交接文档（HANDOFF）
 
 > 交接对象：**后续接手本作品集开发的 Agent**
-> 更新：2026-09-14 · 被测 = 自有 **EspoCRM** 实例（唯一被测；**不使用公开 demo**）
+> 更新：2026-09-17 · 被测 = 自有 **EspoCRM** 实例（唯一被测；**不使用公开 demo**）
 
 ## 0. 交接摘要（30 秒）
 
@@ -9,7 +9,8 @@
 - **仓库**：本目录 `playwright-qa-portfolio`（本地 git；未 push GitHub）
 - **被测**：EspoCRM 实例 `http://<BASE_URL>`，管理员 `admin/**REDACTED**`（经 `.env` 注入，不入库）
 - **CI**：Github Actions 打**同一自有实例**（3 个 secrets：`ESPOCRM_BASE_URL` / `ESPOCRM_ADMIN_USER` / `ESPOCRM_ADMIN_PASS`）；**无公开 demo 通道**
-- **状态**：env 接入、config、登录 POM、auth.setup(storageState) 完成；**auth.spec 4/4 绿**（~12s）；accounts/leads 等待做
+- **包管理**：**pnpm**（`pnpm-lock.yaml` 已生成；CI 用 `pnpm install --frozen-lockfile`）
+- **状态**：env 接入、config、登录 POM、auth.setup(storageState) 完成；**auth.spec 3/3 绿**（~18s）；accounts/leads 等待做
 - **下一步**：accounts.spec → leads.spec → CI secrets 配置 → GitHub push
 
 ## 1. 决策基线（用户确认，必须遵守）
@@ -23,20 +24,21 @@
 
 ```
 playwright-qa-portfolio/
+├── AGENTS.md              # ✅ 开发准则（Exa 调研固化；接手前必读）
 ├── playwright.config.ts   # multi-project + dotenv + channel chrome + 超时范式
 ├── .env                   # (gitignore) BASE_URL/ADMIN_USER/ADMIN_PASS 真实值
 ├── .env.example
 ├── pages/LoginPage.ts     # EspoCRM 登录 POM（实测）
 ├── tests/
 │   ├── auth.setup.ts      # 登录 → storageState
-│   ├── auth.spec.ts       # ✅ 4/4 绿
+│   ├── auth.spec.ts       # ✅ 3/3 绿
 │   └── helpers/fixtures.ts# test.extend：当前 employee → 需通用化
-├── .github/workflows/ci.yml  # secrets 注入自有实例
-└── README.md              # 已更新（被测=EspoCRM 实例）
+├── .github/workflows/ci.yml  # secrets 注入自有实例（pnpm）
+└── README.md              # 已更新（被测=EspoCRM 实例；pnpm 命令）
 ```
 
-- deps：`@playwright/test` + `typescript` + `dotenv`（Node 26/npm 11）
-- 本地跑：`npx playwright test`；report：`npx playwright show-report`
+- deps：`@playwright/test` + `typescript` + `dotenv`（Node 26/pnpm 11）
+- 本地跑：`pnpm test`；report：`pnpm exec playwright show-report`
 
 ## 3. 已完成并验证
 
@@ -46,8 +48,8 @@ playwright-qa-portfolio/
 | projects | setup / desktop-chromium(+channel chrome) / mobile / webkit-smoke(仅 smoke/)，依赖 setup；`retries CI2:0`、`workers CI1:1`、timeout 90s/nav 120s/expect 15s、trace/shot/video 按需 |
 | LoginPage | `input[name=username|password]` + `button · Log in`（实测）；open/login/waitForLoggedIn |
 | auth.setup | 登录 → `.navbar` 可见 → storageState `playwright/.auth/user.json` |
-| auth.spec | 正确登录 / 错密码（滞留登录页）/ 空字段（`Username can not be empty`）→ 4/4 绿 (11.9s) |
-| 元数据 | 仓库更名 `playwright-qa-portfolio`；README/package 更新为 EspoCRM 实例 |
+| auth.spec | 正确登录 / 错密码（滞留登录页）/ 空字段（`can not be empty`）→ 3/3 绿 (~18s) |
+| 元数据 | 仓库更名 `playwright-qa-portfolio`；README/package 更新为 EspoCRM 实例；切 **pnpm**（删 package-lock.json，CI/README/HANDOFF 同步）；新增 `AGENTS.md` 开发准则 |
 
 ## 4. 待办（接手顺序）
 
@@ -70,7 +72,8 @@ playwright-qa-portfolio/
 - **凭据**：`admin/**REDACTED**` 仅存本机 `.env`；日志/报告/README 不得出现密码明文
 - **不建 webServer**：被测是用户实例
 - **EspoCRM API（可选造数）**：`POST /api/v1/App/user` 以 `Espo-Authorization: Base64(user:pass)` 拿 token，后续 accounts/leads 数据可走 API（P2 增强）
-- **别把 `.env`、`test-results/`、`playwright/.auth/` 提交入库**
+- **别把 `.env`、`test-results/`、`playwright/.auth/` 提交入库**；也别用 npm 生成/提交 `package-lock.json`（包管理统一 pnpm）
+- **node 启动报缺库**（如 llhttp dylib）：`brew install <缺的库>` 修复；node 由 Homebrew 管理
 
 ## 6. 风险与边界
 
@@ -82,7 +85,8 @@ playwright-qa-portfolio/
 
 ## 7. 参考
 
+- **开发准则**：`AGENTS.md`（接手必读；含 6 条必守规则 + Exa 调研固化的权威来源）
 - Playwright：/docs/pom · /test-fixtures · /test-configuration · /auth · /test-retries · /test-parallel · /ci
 - 被测入口：`http://<BASE_URL>`（admin/**REDACTED**）
 
-_文档版本：2026-09-14 · HANDOFF v1_
+_文档版本：2026-09-17 · HANDOFF v2_
