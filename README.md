@@ -18,8 +18,8 @@ Playwright (TypeScript) test automation portfolio built against a private **Espo
 | Accounts spec (`tests/accounts.spec.ts`): create / detail / edit / search / delete | Done, passing |
 | Leads spec (`tests/leads.spec.ts`): create / search / convert | Done, passing |
 | Data factory fixtures (`tests/helpers/fixtures.ts`) | Done (`uniqueName` + `unique` fixture) |
-| CI workflow (`.github/workflows/ci.yml`) | Ready; requires 3 GitHub secrets |
-| GitHub push | Pending (repo not yet published) |
+| CI workflow (`.github/workflows/ci.yml`) | Running — Actions green (push + workflow_dispatch) |
+| GitHub push | Done — `github.com/xhao6/playwright-qa-portfolio` (public) |
 
 > Tracked in detail in [`HANDOFF.md`](./HANDOFF.md).
 

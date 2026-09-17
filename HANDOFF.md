@@ -69,10 +69,10 @@ playwright-qa-portfolio/
 1. ✅ **accounts.spec**：`/#/Account` 创建（唯一后缀名）→ 详情 → 编辑 → 列表搜索（含负向控制）→ 删除清理 → 5/5 绿（先 probe 再落 spec）
 2. ✅ **leads.spec**：创建 Lead → 详情 → 列表搜索（含负向控制）→ 转换 → 断言 → 清理（转换产物走 API 清理）→ 4/4 绿（先 probe 再落 spec）
 
-### P1 · 工程面（剩余）
-3. **CI secrets**：用户在 GitHub repo 配 `ESPOCRM_BASE_URL`/`ESPOCRM_ADMIN_USER`/`ESPOCRM_ADMIN_PASS`（注意：`secrets` 对 fork-PR 不生效，当前 workflow 用 push+workflow_dispatch）
+### P1 · 工程面 ✅ 已完成
+3. ✅ **CI secrets**：已配置 `ESPOCRM_BASE_URL`/`ESPOCRM_ADMIN_USER`/`ESPOCRM_ADMIN_PASS`（注意：`secrets` 对 fork-PR 不生效，当前 workflow 用 push+workflow_dispatch）
 4. ✅ ~~**fixtures.ts**~~：已通用化为唯一数据工厂（`uniqueName` 用模块级 seq；`unique` fixture 用 workerIndex）
-5. **push**：GitHub 建空 repo（建议同名）`git remote add origin <url>` → `git push -u origin main`（gh 未装，或用 gh 授权后 `gh repo create --source=. --public --push`）
+5. ✅ **push**：已 push `https://github.com/xhao6/playwright-qa-portfolio`（main）；CI Actions 绿（3m18s）；push 前用 `git filter-repo` 清除了历史中残留的凭据/IP
 
 ### P2 · 加分（后续可选）
 - `search-table`（搜索/排序/分页）· `i18n`（切中文判定功能）· `responsive`（3 视口）· `acl`（Administration → Roles）
@@ -92,9 +92,9 @@ playwright-qa-portfolio/
 
 | 风险 | 缓解 |
 |---|---|
-| CI 打自有实例依赖 secret 与公网可达 | 用户在 GitHub 配 3 secrets；实例端口需对 Actions 放行 |
+| CI 打自有实例依赖 secret 与公网可达 | 3 secrets 已配；实例端口需对 Actions 放行（已实测绿） |
 | 实例被暴力写入 | 仅自建唯一数据并清理；workers 低 |
-| 未 push | 用户建 repo 或装 gh |
+| 公开 repo 泄密 | 历史已 filter-repo 清除凭据/IP；`.env`/`test-results/`/`playwright/.auth/` gitignore |
 
 ## 7. 参考
 
@@ -102,4 +102,4 @@ playwright-qa-portfolio/
 - Playwright：/docs/pom · /test-fixtures · /test-configuration · /auth · /test-retries · /test-parallel · /ci
 - 被测入口：`<BASE_URL>`（env 注入；凭据 `ADMIN_USER`/`ADMIN_PASS`，见 `.env.example`）
 
-_文档版本：2026-09-17 · HANDOFF v3_
+_文档版本：2026-09-17 · HANDOFF v3.1_
