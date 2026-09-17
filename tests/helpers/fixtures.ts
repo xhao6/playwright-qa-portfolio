@@ -1,19 +1,23 @@
-import { test as base } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 
-export const UNIQUE = `Auto_${Date.now().toString().slice(-6)}`;
+const TS = Date.now().toString().slice(-6);
+let seq = 0;
 
-export interface NewEmployee {
-  firstName: string;
-  lastName: string;
+export function uniqueName(prefix: string): string {
+  return `${prefix}_${TS}_${++seq}`;
 }
 
-export const test = base.extend<{ employee: () => NewEmployee }>({
-  employee: async ({}, use) => {
-    await use(() => ({
-      firstName: UNIQUE,
-      lastName: `PIM_${process.pid.toString().slice(-3)}`,
-    }));
+export const test = base.extend<{ unique: (prefix: string) => string }>({
+  unique: async ({}, use, testInfo) => {
+    const used = new Set<string>();
+    await use((prefix: string) => {
+      const baseName = `${prefix}_${TS}_${testInfo.workerIndex}`;
+      let name = baseName;
+      for (let i = 2; used.has(name); i++) name = `${baseName}_${i}`;
+      used.add(name);
+      return name;
+    });
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect };
