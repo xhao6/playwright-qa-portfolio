@@ -36,7 +36,7 @@ playwright-qa-portfolio/
 │   ├── auth.spec.ts       # ✅ 3/3 绿
 │   ├── accounts.spec.ts   # ✅ 5/5 绿（创建/详情/编辑/搜索×2/删除；自建自清）
 │   ├── leads.spec.ts      # ✅ 4/4 绿（创建/搜索×2/Convert；转换产物走 API 清理）
-│   ├── helpers/fixtures.ts# ✅ 已通用化：uniqueName + unique fixture（Auto_<ts>+workerIndex）
+│   ├── helpers/fixtures.ts# ✅ 已通用化：uniqueName（模块级 seq）+ unique fixture（workerIndex）
 │   └── helpers/fixtures.spec.ts # ✅ fixtures 自测 2/2
 ├── docs/
 │   ├── target-understanding.md # 被测全局理解（模块/字段/实体关系，实测）
@@ -60,7 +60,7 @@ playwright-qa-portfolio/
 | probe | Accounts/Leads 页 DOM 探测落盘 `docs/probe/accounts-dom.md`、`docs/probe/leads-dom.md`（locator 决议依据，已脱敏）；`docs/target-understanding.md` 全局理解入库 |
 | AccountsPage + accounts.spec | 创建（`unique('Auto_Account')`）→ 详情 → 编辑 website → 列表搜索（命中 + 负向控制 `Auto_zzz_no_such_record`）→ 删除清理；5/5 绿；locator 收敛 POM |
 | LeadsPage + leads.spec | 创建 Lead → 详情 → 列表搜索（命中 + 负向控制）→ **Convert**（断言 status=Converted、Convert 按钮消失）；4/4 绿；**转换产物 Account/Contact/Opportunity 走 API 清理**（`Espo-Authorization` + 删除 `createdAccountId/createdContactId/createdOpportunityId`），失败仅 console.error 不掩盖断言 |
-| fixtures | `uniqueName(prefix)` + `unique` fixture（`Auto_<ts>` + workerIndex + 同测内去重），自测 2/2 绿 |
+| fixtures | `uniqueName(prefix)`（`Auto_<ts>` + 模块级 seq）+ `unique` fixture（`Auto_<ts>` + workerIndex，同测内去重），自测 2/2 绿 |
 | 元数据 | 仓库更名 `playwright-qa-portfolio`；README/package 更新为 EspoCRM 实例；切 **pnpm**（删 package-lock.json，CI/README/HANDOFF 同步）；新增 `AGENTS.md` 开发准则 |
 
 ## 4. 待办（接手顺序）
@@ -71,12 +71,12 @@ playwright-qa-portfolio/
 
 ### P1 · 工程面（剩余）
 3. **CI secrets**：用户在 GitHub repo 配 `ESPOCRM_BASE_URL`/`ESPOCRM_ADMIN_USER`/`ESPOCRM_ADMIN_PASS`（注意：`secrets` 对 fork-PR 不生效，当前 workflow 用 push+workflow_dispatch）
-4. ✅ ~~**fixtures.ts**~~：已通用化为唯一数据工厂（`uniqueName` + `unique` fixture，`Auto_<ts>` + workerIndex 沿用）
+4. ✅ ~~**fixtures.ts**~~：已通用化为唯一数据工厂（`uniqueName` 用模块级 seq；`unique` fixture 用 workerIndex）
 5. **push**：GitHub 建空 repo（建议同名）`git remote add origin <url>` → `git push -u origin main`（gh 未装，或用 gh 授权后 `gh repo create --source=. --public --push`）
 
 ### P2 · 加分（后续可选）
 - `search-table`（搜索/排序/分页）· `i18n`（切中文判定功能）· `responsive`（3 视口）· `acl`（Administration → Roles）
-- **API 测试层**：`Espo-Authorization` 认证通道已探明（见 §5），计划见 `docs/superpowers/plans/2026-09-17-api-test-layer.md`
+- **API 测试层**：`Espo-Authorization` basic 认证通道已探明（见 §5 与 `docs/probe/leads-dom.md`），计划见 `docs/superpowers/plans/2026-09-17-api-test-layer.md`
 - **测试策略文档**：计划见 `docs/superpowers/plans/2026-09-17-test-strategy-doc.md`
 
 ## 5. 技术备忘 / 易踩坑
@@ -84,7 +84,7 @@ playwright-qa-portfolio/
 - **数据纪律**：自建自清（`Auto_<ts>` + workerIndex），不动预置数据
 - **凭据**：管理员凭据（`ADMIN_USER`/`ADMIN_PASS`）仅存本机 `.env`；日志/报告/README 不得出现密码明文
 - **不建 webServer**：被测是用户实例
-- **EspoCRM API（可选造数）**：`POST /api/v1/App/user` 以 `Espo-Authorization: Base64(user:pass)` 拿 token，后续 accounts/leads 数据可走 API（P2 增强）
+- **EspoCRM API（可选造数）**：实测（10.0.8）`POST /api/v1/App/user` → **405**；`GET /api/v1/App/user` + `Espo-Authorization: Base64(user:pass)` → 200（带 token）；**业务 API（Lead/Account 等）直接用 `Espo-Authorization` basic header 即可**（`X-Auth-Token` → 401）。`tests/leads.spec.ts` 的转换产物清理已按此实现；详见 `docs/probe/leads-dom.md`
 - **别把 `.env`、`test-results/`、`playwright/.auth/` 提交入库**；也别用 npm 生成/提交 `package-lock.json`（包管理统一 pnpm）
 - **node 启动报缺库**（如 llhttp dylib）：`brew install <缺的库>` 修复；node 由 Homebrew 管理
 

@@ -21,7 +21,7 @@
 ## 架构约定
 
 - **POM**：`pages/*.ts`，每个页面一个类（参考 `pages/LoginPage.ts`：`open/login/waitForLoggedIn` 模式），locator 收敛在 POM 内
-- **Fixtures**：`tests/helpers/fixtures.ts` 用 `test.extend` 提供唯一数据工厂（`UNIQUE` 后缀），业务 spec 从 fixtures 取数据；现有 `employee` fixture 待通用化
+- **Fixtures**：`tests/helpers/fixtures.ts` 已通用化——`uniqueName(prefix)`（`Auto_<ts>` + 模块级 seq）与 `unique` fixture（`Auto_<ts>` + workerIndex，同测内去重）；业务 spec 从 fixtures 取数据
 - **认证**：`tests/auth.setup.ts` 登录 → storageState `playwright/.auth/user.json`；所有 project 依赖 `setup`
 - **spec 命名**：`*.spec.ts` 复数业务名（accounts / leads），smoke 放 `tests/smoke/`（仅 webkit-smoke project 跑）
 
@@ -44,6 +44,7 @@ pnpm exec playwright show-report       # 查看 HTML 报告
 
 ## 参考（Exa 调研固化的权威来源）
 
+- 被测系统理解（模块/字段/实体关系，实机探测）：`docs/target-understanding.md`
 - Playwright 官方最佳实践：https://playwright.dev/docs/best-practices
 - Playwright CI：https://playwright.dev/docs/ci
 - Fixtures：https://playwright.dev/docs/test-fixtures

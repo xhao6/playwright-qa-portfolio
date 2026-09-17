@@ -46,7 +46,7 @@ pnpm exec playwright show-report         # view HTML report
 |---|---|---|
 | `desktop-chromium` | Desktop Chrome | Full UI suite |
 | `mobile` | Pixel 5 | Mobile viewport |
-| `webkit-smoke` | Desktop Safari | Cross-browser smoke evidence |
+| `webkit-smoke` | Desktop Safari | Reserved for cross-browser smoke suite (no specs yet) |
 
 All projects depend on `setup`, which logs in once and persists `storageState` for shared sessions.
 
