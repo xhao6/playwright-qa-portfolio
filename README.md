@@ -22,7 +22,7 @@
 | CI workflow（`.github/workflows/ci.yml`） | ✅ 运行中 — Actions 绿（push + workflow_dispatch） |
 | GitHub push | ✅ 已推送 `github.com/xhao6/playwright-qa-portfolio`（public） |
 
-> 进度明细见 [`HANDOFF.md`](./HANDOFF.md)，测试策略见 [`docs/TEST_PLAN.md`](./docs/TEST_PLAN.md)，开发规范见 [`AGENTS.md`](./AGENTS.md)。
+> 测试策略见 [`docs/TEST_PLAN.md`](./docs/TEST_PLAN.md)，开发规范见 [`AGENTS.md`](./AGENTS.md)。
 
 ## 配置
 

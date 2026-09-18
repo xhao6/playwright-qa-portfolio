@@ -1,13 +1,13 @@
 # AGENTS.md — Playwright + EspoCRM QA Portfolio 开发准则
 
-> 给接手本仓库的 Agent 的开发规范。执行任何修改前先读本文件与 `HANDOFF.md`。
+> 给接手本仓库的 Agent 的开发规范。执行任何修改前先读本文件与 `docs/TEST_PLAN.md`。
 
 ## 项目定位
 
 - Playwright + TypeScript 自动化测试作品集，被测 = **自有 EspoCRM 实例**（凭据经 `.env` 注入，**严禁入库**）
 - 只做测试工程：**不建 webServer / docker-compose**，被测是用户实例
 - 包管理：**pnpm**（lockfile = `pnpm-lock.yaml`，勿用 npm 生成/提交 `package-lock.json`）
-- 状态追踪见 `HANDOFF.md`（含 P0/P1/P2 待办顺序）
+- 状态与路线图：当前状态见 `README.md`，后续可选增强见 `docs/TEST_PLAN.md` 第 10 节
 
 ## 必守规则
 

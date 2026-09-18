@@ -1,7 +1,7 @@
 # Test Plan — Playwright + EspoCRM QA Portfolio
 
 > **本文档是测试策略真源**：定义测什么、怎么测、如何判定通过。
-> 执行进度见 [`../HANDOFF.md`](../HANDOFF.md)；开发规范（定位器/数据/断言纪律）见 [`../AGENTS.md`](../AGENTS.md)。
+> 开发规范（定位器/数据/断言纪律）见 [`../AGENTS.md`](../AGENTS.md)。
 
 ## 1. Scope
 
@@ -97,10 +97,18 @@ pnpm exec playwright show-report       # 查看 HTML 报告
 - HTML 报告可查；CI 失败用例有 trace 可诊断（本地失败仅 screenshot）
 - 新增/修改的 spec 满足本文件第 4、5 节纪律
 
-## 10. References
+## 10. Roadmap（后续可选）
+
+- `search-table`：列表搜索/排序/分页深度用例（当前仅覆盖名称搜索命中与负向）
+- `i18n`：切换中文界面后的功能判定用例
+- `responsive`：多断点布局断言（计算属性而非纯截图；当前 mobile 仅视口重跑）
+- `acl`：Administration → Roles 权限用例（受限角色不可见某模块）
+- 补 `tests/smoke/` WebKit 冒烟（登录 + Account 创建/搜索），填上预留空壳
+- 用例造数切换 API（提速 + 降 flaky），UI 仅保留一条「UI 创建」契约用例
+
+## 11. References
 
 - [`../AGENTS.md`](../AGENTS.md) — 开发准则（必守规则、架构约定）
-- [`../HANDOFF.md`](../HANDOFF.md) — 进度、待办与交接
 - [`probe/`](./probe/) — 真实 DOM/API 决议（探测产物）
 - Playwright 官方：best-practices · test-fixtures · pom · ci（完整 URL 见 `../AGENTS.md` 参考节）
 - [`target-understanding.md`](./target-understanding.md) — 被测系统理解（模块/字段/实体关系，实测）
